@@ -106,6 +106,7 @@ const GuessingGame = ({ initialWord, onReset }) => {
     <div className="guessing-game-container">
       <h2>Guess the Word!</h2>
       <form onSubmit={handleGuessSubmit} className="guess-form">
+          <div>
         {currentGuess.map((letter, index) => (
           <input
             key={index}
@@ -119,7 +120,8 @@ const GuessingGame = ({ initialWord, onReset }) => {
             disabled={isCorrect}
             pattern="[A-Za-z]"
           />
-        ))}
+          ))}
+          </div>
         <button type="submit" className="guess-button" disabled={isCorrect}>Guess</button>
       </form>
       {errorMessage && <div className="error-message">{errorMessage}</div>}

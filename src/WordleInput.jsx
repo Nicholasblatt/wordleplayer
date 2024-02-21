@@ -61,6 +61,7 @@ const WordInput = ({ onWordSubmit }) => {
                 Create a secret word for someone to guess. They will receive hints in a wordle-like fashion.
             </p>
             <form onSubmit={handleSubmit} className="word-input-form">
+                <div>
                 {letters.map((letter, index) => (
                     <input
                         key={index}
@@ -75,6 +76,7 @@ const WordInput = ({ onWordSubmit }) => {
                         onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')}
                     />
                 ))}
+                </div>
                 <button type="submit" className="submit-button">Set Word</button>
             </form>
             {errorMessage && <div className="error-message">{errorMessage}</div>}

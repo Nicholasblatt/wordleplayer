@@ -138,16 +138,21 @@
     align-items: stretch;
   }
 
-  .word-input-form,
-  .guess-form {
+  .word-input-form{
     align-items: center;
+  }
+
+  .guess-form, .word-input-form {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
   }
 
   .letter-box,
   .guessed-letter {
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
   }
 
   .submit-button,
