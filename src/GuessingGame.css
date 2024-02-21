@@ -1,106 +1,180 @@
-/* GuessingGame.css */
 .guessing-game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-  
-  .guess-form {
-    display: flex;
-    gap: 10px; /* Adjust the gap between boxes */
-  }
-  
- /* WordInput.css */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.guess-form {
+  display: flex;
+  gap: 10px;
+}
+
 .letter-box {
-    font-size: 36px; /* Larger font size for better visibility */
-    padding: 12px; /* Increased padding to make the box larger */
-    width: 70px; /* Increased width for a larger box */
-    height: 70px; /* Increased height for a larger box */
-    margin: 4px; /* Optional: add some space around each box */
-    border: 2px solid #000; /* Solid border for the letter boxes */
-    border-radius: 4px; /* Rounded corners to match the guessed letter boxes */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Shadow for aesthetics */
+  font-size: 36px;
+  padding: 12px;
+  width: 70px;
+  height: 70px;
+  margin: 4px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.guess-button {
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.guess-button:disabled {
+  background-color: #ccc;
+}
+
+.guesses-container {
+  margin-top: 20px;
+}
+
+.guess {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.guessed-letter {
+  font-size: 32px;
+  padding: 10px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #000;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.correct-letter {
+  background-color: #4CAF50;
+}
+
+.misplaced-letter {
+  background-color: #FFEB3B;
+}
+
+.play-again-button {
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-top: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.play-again-button:hover {
+  background-color: #367c39;
+  transform: scale(1.05);
+}
+
+.congratulations-message {
+  color: #4CAF50;
+}
+
+.game-over-message {
+  color: #FF0000;
+}
+
+.revealed-word {
+  font-size: larger;
+}
+
+.error-message {
+  color: #FF0000;
+  margin-top: 10px;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0px);
   }
-  
-  .guess-button {
-    padding: 10px 20px;
-    font-size: 18px;
-    cursor: pointer;
-    border: none;
-    background-color: #007bff; /* Bootstrap primary color for example */
-    color: white;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  25% {
+    transform: translateX(-5px);
   }
-  
-  .guess-button:disabled {
-    background-color: #ccc; /* Grey out the button when disabled */
+  50% {
+    transform: translateX(5px);
   }
-  
-  .guesses-container {
-    margin-top: 20px;
+  75% {
+    transform: translateX(-5px);
   }
-  
-  .guess {
-    display: flex;
-    justify-content: center;
-    gap: 10px; /* Adjust the gap between boxes to match the top ones */
+  100% {
+    transform: translateX(5px);
   }
-  
-  .guessed-letter {
-    font-size: 32px; /* Larger font size for better visibility */
+}
+
+.shake-animation {
+  animation: shake 0.5s;
+  border-color: red !important;
+  outline: none;
+}
+
+.green-border {
+  border-color: darkgreen !important;
+  outline: none;
+}
+
+@media (max-width: 700px) {
+  .app-container,
+  .guessing-game-container {
     padding: 10px;
-    width: 60px; /* Width enough to comfortably fit one letter */
-    height: 60px; /* Height to make it look like a box */
-    display: flex;
-    justify-content: center;
+    align-items: stretch;
+  }
+
+  .word-input-form,
+  .guess-form {
     align-items: center;
-    border: 2px solid #000; /* Solid border for the letter boxes */
-    border-radius: 4px; /* Optional: Rounded corners to match the top boxes */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Shadow for aesthetics */
-  }
-  
-  /* Add these styles for color coding */
-  .correct-letter {
-    background-color: #4CAF50; /* Green background for correct letters in the correct spot */
-  }
-  
-  .misplaced-letter {
-    background-color: #FFEB3B; /* Yellow background for correct letters in the wrong spot */
   }
 
+  .letter-box,
+  .guessed-letter {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+  }
+
+  .submit-button,
+  .guess-button,
   .play-again-button {
-    padding: 10px 20px;
-    font-size: 18px;
-    cursor: pointer;
-    background-color: #4CAF50; /* or any other color you prefer */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    margin-top: 20px; /* Add some space above the button */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    /* Transition for a nice hover effect */
-    transition: background-color 0.2s, transform 0.1s;
-  }
-  
-  .play-again-button:hover {
-    background-color: #367c39; /* Darker shade for hover state */
-    transform: scale(1.05); /* Slight increase in size when hovered */
+    width: 100%;
+    margin-top: 10px;
   }
 
-  .congratulations-message {
-    color: #4CAF50; /* Green color for success messages */
-    /* Additional styling as needed */
-  }
-  
+  .intro-text,
+  .error-message,
+  .congratulations-message,
   .game-over-message {
-    color: #FF0000; /* Red color for game over messages */
-    /* Additional styling as needed */
+    padding: 0 5px;
+    font-size: 16px;
   }
-  
-  .revealed-word {
-    font-size: larger; /* Make the font larger for visibility */
-    /* Additional styling as needed */
+
+  .error-message {
+    margin-top: 5px;
   }
-  
+
+  .guesses-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .guess {
+    justify-content: center;
+  }
+}

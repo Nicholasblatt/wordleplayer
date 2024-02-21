@@ -1,17 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './WordInput.css'; // Make sure this is the correct path to your CSS file
+import './WordInput.css';
+import axios from 'axios';
 
 const WordInput = ({ onWordSubmit }) => {
     const [letters, setLetters] = useState(Array(5).fill(''));
     const letterRefs = useRef(Array(5).fill().map(() => React.createRef()));
+    const [errorMessage, setErrorMessage] = useState('');
+    const [shakeError, setShakeError] = useState(false);
 
     useEffect(() => {
-        letterRefs.current[0].current.focus(); // Automatically focus the first input on mount
+        letterRefs.current[0].current.focus();
     }, []);
 
     const handleKeyDown = (index) => (event) => {
         if (event.key === 'Backspace' && !letters[index] && index > 0) {
-            // Set focus to previous input box if current is empty and it's not the first box
             letterRefs.current[index - 1].current.focus();
         }
     };
@@ -21,23 +23,42 @@ const WordInput = ({ onWordSubmit }) => {
         newLetters[index] = event.target.value.toUpperCase().slice(0, 1);
         setLetters(newLetters);
 
-        // Move to the next input box if we've entered a letter
         if (index < 4 && newLetters[index].length === 1) {
             letterRefs.current[index + 1].current.focus();
         }
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const word = letters.join('');
-        onWordSubmit(word);
+        if (word.length < 5) {
+            setShakeError(true);
+            setErrorMessage('Word must be 5 letters.');
+            setTimeout(() => setShakeError(false), 500);
+            return;
+        }
+        try {
+            const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
+            if (response.data.length > 0) {
+                onWordSubmit(word);
+                setErrorMessage('');
+            } else {
+                setShakeError(true);
+                setErrorMessage('Word not found.');
+                setTimeout(() => setShakeError(false), 500);
+            }
+        } catch (error) {
+            setShakeError(true);
+            setErrorMessage('Word not found.');
+            setTimeout(() => setShakeError(false), 500);
+        }
     };
 
     return (
         <div className="app-container">
             <h1>Welcome to Word Guesser!</h1>
             <p className="intro-text">
-                Create a secret word for someone to guess. They will recieve hints in a wordle like fasion.
+                Create a secret word for someone to guess. They will receive hints in a wordle-like fashion.
             </p>
             <form onSubmit={handleSubmit} className="word-input-form">
                 {letters.map((letter, index) => (
@@ -46,16 +67,17 @@ const WordInput = ({ onWordSubmit }) => {
                         ref={letterRefs.current[index]}
                         type="text"
                         maxLength="1"
-                        className="letter-box"
+                        className={`letter-box ${shakeError ? 'shake-animation' : ''}`}
                         value={letter}
                         onChange={handleChange(index)}
                         onKeyDown={handleKeyDown(index)}
-                        pattern="[A-Za-z]" // This pattern ensures only alphabetical characters are allowed
-                        onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')} // Prevents non-alphabetical characters
+                        pattern="[A-Za-z]"
+                        onInput={(e) => e.target.value = e.target.value.replace(/[^A-Za-z]/g, '')}
                     />
                 ))}
                 <button type="submit" className="submit-button">Set Word</button>
             </form>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
         </div>
     );
 };

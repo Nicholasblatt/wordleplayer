@@ -9,21 +9,18 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If initialWord is set, allow navigating to /guess and navigate there
     if (initialWord) {
-      setAllowGuessRoute(true); // Allow access to /guess route
+      setAllowGuessRoute(true);
       navigate('/guess');
     }
-  }, [initialWord, navigate]); // Depend on initialWord and navigate function
+  }, [initialWord, navigate]);
 
   const handleWordSubmit = (word) => {
-    setInitialWord(word); // This will trigger the useEffect to navigate to /guess
+    setInitialWord(word);
   };
 
-  // Reset the initialWord and any other state as necessary
   const resetGame = () => {
     setInitialWord('');
-    // other resets if necessary
   };
 
   return (
@@ -31,7 +28,7 @@ function App() {
       <Routes>
         <Route path="/" element={<WordInput onWordSubmit={handleWordSubmit} />} />
         <Route path="/guess" element={
-          allowGuessRoute 
+          allowGuessRoute
             ? <GuessingGame initialWord={initialWord} onReset={resetGame} />
             : <Navigate replace to="/" />
         } />

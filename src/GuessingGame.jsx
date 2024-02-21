@@ -1,39 +1,37 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './GuessingGame.css'; // Make sure this is the correct path to your CSS file
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-
+import './GuessingGame.css';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const GuessingGame = ({ initialWord, onReset }) => {
   const [guesses, setGuesses] = useState([]);
   const [isCorrect, setIsCorrect] = useState(false);
   const [currentGuess, setCurrentGuess] = useState(Array(5).fill(''));
+  const [errorMessage, setErrorMessage] = useState('');
+  const [shakeError, setShakeError] = useState(false);
+  const [validInput, setValidInput] = useState(false);
+
   const letterRefs = useRef(Array(5).fill().map(() => React.createRef()));
-  const navigate = useNavigate(); // Hook for navigation
-  const maxGuesses = 6; // Maximum number of incorrect guesses allowed
-  // Check if the game is over due to too many incorrect guesses
+  const navigate = useNavigate();
+  const maxGuesses = 6;
   const isGameOver = guesses.length >= maxGuesses && !isCorrect;
 
-  // Call this function when you want to reset the game state and navigate back
   const playAgain = () => {
-    // Reset the game state
-    setGuesses([]); // Resets the guesses array
-    setIsCorrect(false); // Resets the isCorrect flag
-    setCurrentGuess(Array(5).fill('')); // Resets the current guess
-    // Call the onReset prop if it exists to reset the parent state
+    setGuesses([]);
+    setIsCorrect(false);
+    setCurrentGuess(Array(5).fill(''));
     if (onReset) {
       onReset();
     }
-    // Navigate back to the home screen
     navigate('/');
   };
 
   useEffect(() => {
-    letterRefs.current[0].current.focus(); // Automatically focus the first input on mount
+    letterRefs.current[0].current.focus();
   }, []);
 
   const handleBackspace = (index) => (event) => {
     if (event.key === 'Backspace' && !currentGuess[index] && index > 0) {
-      // Set focus to previous input box if current is empty and it's not the first box
       letterRefs.current[index - 1].current.focus();
     }
   };
@@ -43,69 +41,66 @@ const GuessingGame = ({ initialWord, onReset }) => {
     setCurrentGuess((prev) =>
       prev.map((char, charIndex) => (charIndex === index ? value : char))
     );
-    // Automatically move to the next input after entering a letter
     if (value && index < 4) {
       letterRefs.current[index + 1].current.focus();
     }
   };
 
-  const handleGuessSubmit = (event) => {
+  const handleGuessSubmit = async (event) => {
     event.preventDefault();
-    const guess = currentGuess.join('');
-    if (guess.length === 5) {
-      if (!isGameOver) {
-        setGuesses((prevGuesses) => [...prevGuesses, guess]);
-        setIsCorrect(guess === initialWord);
-        setCurrentGuess(Array(5).fill(''));
-        // Reset focus back to the first input
-        if (guesses.length < maxGuesses - 1) {
-          letterRefs.current[0].current.focus();
+    const guess = currentGuess.join('').toLowerCase();
+    if (guess.length === 5 && !isGameOver) {
+      try {
+        const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${guess}`);
+        if (response.data.length > 0) {
+          setGuesses((prevGuesses) => [...prevGuesses, guess.toUpperCase()]);
+          setIsCorrect(guess.toUpperCase() === initialWord.toUpperCase());
+          setCurrentGuess(Array(5).fill(''));
+          setValidInput(true);
+          setTimeout(() => setValidInput(false), 500);
+          setErrorMessage('');
+          if (guesses.length < maxGuesses - 1) {
+            letterRefs.current[0].current.focus();
+          }
+        } else {
+          setShakeError(true);
+          setErrorMessage('Word not found.');
+          setTimeout(() => setShakeError(false), 500);
         }
+      } catch (error) {
+        setShakeError(true);
+        setErrorMessage('Word not found.');
+        setTimeout(() => setShakeError(false), 500);
       }
     }
   };
 
   const getLetterClass = (letter, position, guess, initialWord) => {
-    // Convert the initialWord to an array to manipulate it
     const wordArray = initialWord.split('');
-
-    // Create an array representing the correct status of each letter in the guess
     const correctStatus = guess.split('').map((g, i) => g === wordArray[i]);
 
-    // If the letter is correct and in the correct position, mark it green
     if (correctStatus[position]) {
-      return 'correct-letter'; // Correct letter in the correct spot
+      return 'correct-letter';
     }
 
-    // If the letter is in the word but not in the correct position
     if (wordArray.includes(letter)) {
-      // Count the number of occurrences of this letter in the guess that are in the correct position
-      const correctOccurrencesInGuess = guess.split('').reduce((total, currentLetter, index) => {
-        return total + (currentLetter === letter && correctStatus[index] ? 1 : 0);
-      }, 0);
+      const correctOccurrencesInGuess = guess.split('').reduce((total, currentLetter, index) => 
+        total + (currentLetter === letter && correctStatus[index] ? 1 : 0), 0);
+      const occurrencesInWord = wordArray.reduce((total, currentLetter) => 
+        total + (currentLetter === letter ? 1 : 0), 0);
 
-      // Count the number of occurrences of this letter in the initial word
-      const occurrencesInWord = wordArray.reduce((total, currentLetter) => {
-        return total + (currentLetter === letter ? 1 : 0);
-      }, 0);
-
-      // If there are more or equal correct occurrences in the guess than in the word,
-      // then this letter should not be marked yellow because it's "used up" by the correct positions.
       if (correctOccurrencesInGuess >= occurrencesInWord) {
-        return ''; // Not marked with a color
+        return '';
       }
 
-      // Finally, check the guess up to the current position to make sure we don't mark more letters yellow than needed
       const pastOccurrencesInGuess = guess.substring(0, position).split('').filter((g) => g === letter).length;
-
       if (pastOccurrencesInGuess < occurrencesInWord) {
-        return 'misplaced-letter'; // Correct letter in the wrong spot
+        return 'misplaced-letter';
       }
     }
 
-    return ''; // No background for incorrect letters
+    return '';
   };
-
 
   return (
     <div className="guessing-game-container">
@@ -117,7 +112,7 @@ const GuessingGame = ({ initialWord, onReset }) => {
             ref={letterRefs.current[index]}
             type="text"
             maxLength="1"
-            className="letter-box"
+            className={`letter-box ${shakeError ? 'shake-animation' : ''} ${validInput ? 'green-border' : ''}`}
             value={letter}
             onChange={handleGuessChange(index)}
             onKeyDown={handleBackspace(index)}
@@ -127,6 +122,7 @@ const GuessingGame = ({ initialWord, onReset }) => {
         ))}
         <button type="submit" className="guess-button" disabled={isCorrect}>Guess</button>
       </form>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
       <div className="guesses-container">
         {guesses.map((userGuess, guessIndex) => (
           <div key={guessIndex} className="guess">
