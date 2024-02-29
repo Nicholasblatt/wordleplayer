@@ -1,7 +1,13 @@
+body, html {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
 .app-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 100vh;
 }
@@ -34,6 +40,34 @@
 
 .submit-button:hover {
   background-color: #0056b3;
+}
+
+.copy-button {
+  padding: 10px 15px;
+  margin-left: 10px; /* Add some space between the Play Here button */
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #f0f0f0; /* A light grey background */
+  border: 1px solid #d0d0d0; /* Slightly darker border */
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Space between icon and text */
+  transition: background-color 0.3s;
+}
+
+.copy-button:hover {
+  background-color: #e0e0e0; /* Slightly darker on hover */
+}
+
+.copy-button:active {
+  background-color: #d0d0d0; /* Even darker when clicked */
+}
+
+.copy-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .intro-text {

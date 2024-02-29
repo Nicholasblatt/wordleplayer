@@ -2,8 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import './GuessingGame.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useParams, Navigate } from 'react-router-dom';
+import CryptoJS from 'crypto-js'; 
 
-const GuessingGame = ({ initialWord, onReset }) => {
+const SECRET_KEY = "your-secret-key"; // Should be a long, random string
+
+function decryptName(ciphertext) {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, SECRET_KEY);
+    return bytes.toString(CryptoJS.enc.Utf8);
+}
+
+const GuessingGame = ({ initialWord, onReset, fromParams = false }) => {
   const [guesses, setGuesses] = useState([]);
   const [isCorrect, setIsCorrect] = useState(false);
   const [currentGuess, setCurrentGuess] = useState(Array(5).fill(''));
@@ -11,8 +20,12 @@ const GuessingGame = ({ initialWord, onReset }) => {
   const [shakeError, setShakeError] = useState(false);
   const [validInput, setValidInput] = useState(false);
 
+  const { wordParam } = useParams();
+  initialWord = fromParams ? decryptName(decodeURIComponent(wordParam)).toUpperCase() : initialWord;
+
   const letterRefs = useRef(Array(5).fill().map(() => React.createRef()));
   const navigate = useNavigate();
+
   const maxGuesses = 6;
   const isGameOver = guesses.length >= maxGuesses && !isCorrect;
 
@@ -27,7 +40,7 @@ const GuessingGame = ({ initialWord, onReset }) => {
   };
 
   useEffect(() => {
-    letterRefs.current[0].current.focus();
+    letterRefs.current[0].current?.focus();
   }, []);
 
   const handleBackspace = (index) => (event) => {
@@ -101,6 +114,11 @@ const GuessingGame = ({ initialWord, onReset }) => {
 
     return '';
   };
+
+
+  if( initialWord === '') {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="guessing-game-container">
